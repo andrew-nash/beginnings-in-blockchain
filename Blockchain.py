@@ -1,6 +1,5 @@
 from Block import Block
 from Transaction import Transaction
-MY_ADDRESS = "f"*64
 MINING_REWARD = 12.5
 class Blockchain:
     def __init__(self):
@@ -12,13 +11,29 @@ class Blockchain:
         self.chain.append(self.genesis)
         self.accounts = {}
 
-    def mine(self):
+    def mine(self, reward_address):
         new_block = Block(self.chain[-1].hash(), list(self.transaction_pool), \
-        timestamp=None, DIFFICULTY=5, mined = (False, None), reward_address = MY_ADDRESS)
+        timestamp=None, DIFFICULTY=5, mined = (False, None), reward_address = reward_address)
+        self.transaction_pool = set([])
         self.add_block(new_block)
 
-    def queue_transaction(self, t):
-        self.transaction_pool.add(t)
+    def queue_transaction(self, transaction):
+        if transaction.sender == '0':
+            if transaction.amount!=MINING_REWARD:
+                return None
+            else:
+                self.transaction_pool.add(transaction)
+                return
+        if not transaction.check_signature():
+            print("UNSIGNED")
+            return None
+        if transaction.sender not in self.accounts:
+            if transaction.amount!=0:
+                return None
+            self.accounts[transaction.sender]=0
+        if self.accounts[transaction.sender]<transaction.amount:
+            return None
+        self.transaction_pool.add(transaction)
 
     def verify_block(self, block):
         for transaction in block.transactions:
@@ -28,7 +43,7 @@ class Blockchain:
                 continue
 
             if not transaction.check_signature():
-                print("USNGINED")
+                print("UNSIGNED")
                 return False
             if transaction.sender not in self.accounts:
                 if transaction.amount!=0:

@@ -3,6 +3,7 @@ from hashlib import sha256
 from Transaction import Transaction
 
 MINING_REWARD = 12.5
+
 class Block:
     def __init__(self, prev_hash, transactions, timestamp=None, DIFFICULTY=5,\
      mined=(False, None), reward_address=None):
@@ -18,7 +19,6 @@ class Block:
             self.mine(reward_address)
         else:
             self.nonce = mined[1]
-
     def hash(self):
         return sha256(str(self).encode('utf-8')).hexdigest()
 
@@ -40,4 +40,4 @@ class Block:
         return
 
     def work(self):
-        return 16**self.DIFFICULTY
+        return 16**5

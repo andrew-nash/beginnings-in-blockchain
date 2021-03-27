@@ -28,6 +28,7 @@ class Transaction:
         hasher.update((str(self.timestamp)+';'+self.sender+';'+self.recipient+';'\
                +str(self.amount)).encode('utf-8'))
         return hasher
+
     def sign(self, pk):
         private_key = RSA.importKey(pk)
         signer = PKCS1_v1_5.new(private_key)

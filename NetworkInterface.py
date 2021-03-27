@@ -1,22 +1,21 @@
 from Blockchain import Blockchain
 from Transaction import Transaction
 from Client import Client
+import json
+
 app = Flask(__name__)
 
 blockchain = Blockchain()
 client = Client()
 
-
 @app.route('/')
 def index():
     return render_template('./index.html')
 
-@app.route('/information/address')
+@app.route('/information/address', methods=['GET'])
 def get_address():
-    return client.public_key
+    return binascii.hexlify(client.public_key).decode('ascii'), 201
 
-@app.route('/transactions/make', methods=['POST'])
-def new_transaction():
-    values = request.form
-    
-    
+def new_transaction(recip_address, amount):
+    t = client.send_money(recip_address, amount)
+    blockchain.queue_transaction(t)
